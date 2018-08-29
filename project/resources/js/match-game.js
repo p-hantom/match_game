@@ -1,10 +1,44 @@
 var MatchGame = {};
+MatchGame.cnt = 0;
+MatchGame.clickTimes = 0;
+MatchGame.checkWin = false;
+MatchGame.playTimes = 0;
 
 $(document).ready(function(){
+
+  $('.btn').click(function(){
+    MatchGame.playTimes++;
+    MatchGame.checkWin=false;
+    MatchGame.clickTimes=0;
+    MatchGame.clear();
+    var totalTime=30000;
+    var countDownTime=totalTime;
+    var x=setInterval(function(){
+      $('#timer').html(countDownTime/1000);
+      countDownTime-=1000;
+      if(countDownTime===-1000){
+        window.alert("You lose!");
+        $('.grades').append('<li><h3>round'+MatchGame.playTimes+': Lose! You clicked '+MatchGame.clickTimes+' times.</h3></li>');
+        //MatchGame.clear();
+        clearInterval(x);
+      }
+      if(MatchGame.checkWin){
+        $('.grades').append('<li><h3>round'+MatchGame.playTimes+': You spent '+(totalTime-countDownTime-1000)/1000+'s! You clicked '+MatchGame.clickTimes+' times!</h3></li>');
+        //MatchGame.clear();
+        clearInterval(x);
+
+      }
+    },1000);
+  });
+
+});
+
+MatchGame.clear = function(){
   var $game=$('#game');
   var cardValues=MatchGame.generateCardValues();
   MatchGame.renderCards(cardValues,$game);
-});
+}
+
 
 /*
   Sets up a new game after HTML document has loaded.
@@ -38,7 +72,7 @@ MatchGame.generateCardValues = function () {
   Converts card values to jQuery card objects and adds them to the supplied game
   object.
 */
-var cnt=0;
+
 
 MatchGame.renderCards = function(cardValues, $game) {
   var colors = [
@@ -81,7 +115,7 @@ MatchGame.flipCard = function($card, $game) {
   if($card.data('isFlipped')===true){
     return;
   }
-
+  MatchGame.clickTimes++;
   $card.css('background-color',$card.data('color'));
   $card.data('isFlipped',true);
   $card.html('<span class="number">'+$card.data('value')+'</span>');
@@ -92,7 +126,7 @@ MatchGame.flipCard = function($card, $game) {
   if(flippedCards.length===2){
     if(flippedCards[0].data('value')==$card.data('value')){
       //change to the match mode
-      cnt++;
+      MatchGame.cnt++;
       var matchCss={
         backgroundColor: 'rgb(153, 153, 153)',
         color: 'rgb(204, 204, 204)'
@@ -101,9 +135,11 @@ MatchGame.flipCard = function($card, $game) {
       flippedCards[1].css('background-color',matchCss.backgroundColor);
       flippedCards[0].css('color',matchCss.color);
       flippedCards[1].css('color',matchCss.color);
-      if(cnt===8){
+      if(MatchGame.cnt===8){
         window.alert("You win!");
-        cnt=0;
+        MatchGame.checkWin = true;
+        MatchGame.cnt=0;
+        //clearInterval(x);
       }
     }
     else{
@@ -125,8 +161,3 @@ MatchGame.flipCard = function($card, $game) {
   }
 
 };
-
-MatchGame.clear = function($game){
-  var cardValues=MatchGame.generateCardValues();
-  MatchGame.renderCards(cardValues,$game);
-}

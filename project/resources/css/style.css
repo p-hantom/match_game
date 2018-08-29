@@ -47,3 +47,12 @@ body{
   font-size: 7rem;
   color: rgb(255,255,255);
 }
+
+button{
+  height: 60px;
+  width: 100%;
+}
+
+#timer{
+  margin-top: 30px;
+}
